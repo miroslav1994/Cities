@@ -14,7 +14,7 @@ public interface CityRepository extends JpaRepository<CityEntity, Long> {
 
     CityEntity findByName(String name);
     @Query(value = "select * from cities c " +
-            " order by c.num_users desc",
+            " order by c.num_users desc, c.created_at",
             nativeQuery = true)
     Page<CityEntity> findAllSorted(Pageable pageable);
 }

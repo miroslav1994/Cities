@@ -88,20 +88,20 @@ public class UserServiceImpl implements UserService {
 
         String email = getCurrentUserEmail();
 
-        List<CityEntity> listCities = new ArrayList<>();
         List<CityDto> returnValue = new ArrayList<>();
         Iterable<CityEntity> favouriteCities = cItyRepository.findAllById(cityIds);
 
+        UserEntity userEntity = userRepository.findUserByEmail(email);
         for(CityEntity city : favouriteCities) {
-            listCities.add(city);
-            CityDto cityDto = new CityDto();
-            BeanUtils.copyProperties(city, cityDto);
-            returnValue.add(cityDto);
+            if(!userEntity.getCities().contains(city)) {
+                userEntity.getCities().add(city);
+                CityDto cityDto = new CityDto();
+                BeanUtils.copyProperties(city, cityDto);
+                returnValue.add(cityDto);
+                city.setNumUsers(city.getNumUsers()+1);
+            }
         }
 
-        UserEntity userEntity = userRepository.findUserByEmail(email);
-
-        userEntity.setCities(listCities);
         userRepository.save(userEntity);
 
         return returnValue;
@@ -115,7 +115,10 @@ public class UserServiceImpl implements UserService {
         UserEntity userEntity = userRepository.findUserByEmail(email);
 
         for(CityEntity city : favouriteCities) {
-            userEntity.getCities().remove(city);
+            if(userEntity.getCities().contains(city)) {
+                userEntity.getCities().remove(city);
+                city.setNumUsers(city.getNumUsers() - 1);
+            }
         }
 
         userRepository.save(userEntity);

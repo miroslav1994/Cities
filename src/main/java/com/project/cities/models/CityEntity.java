@@ -21,6 +21,7 @@ public class CityEntity {
     @Column(nullable = false)
     private Integer population;
     private Date createdAt;
+    @Column(columnDefinition="Long default '0'")
     private Long numUsers = 0L;
 
     @ManyToMany(mappedBy = "cities")

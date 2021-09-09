@@ -36,12 +36,14 @@ public class CityServiceImpl implements CityService {
         CityEntity cityEntity = new CityEntity();
         BeanUtils.copyProperties(cityDto, cityEntity);
 
-        if(cityRepository.findByName(cityDto.getName()) != null) throw new CityServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
+        if(cityRepository.findByName(cityDto.getName()) != null)
+            throw new CityServiceException(ErrorMessages.RECORD_ALREADY_EXISTS.getErrorMessage());
 
-        if(cityEntity.getPopulation() == 0 || cityEntity.getName().isEmpty()
-        || cityEntity.getDescription().isEmpty())  throw new CityServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
+        if(cityEntity.getPopulation() == 0 || cityEntity.getName().isEmpty() || cityEntity.getDescription().isEmpty())
+            throw new CityServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 
         cityEntity.setCreatedAt(new Date());
+        cityEntity.setNumUsers(0L);
         cityRepository.save(cityEntity);
 
         BeanUtils.copyProperties(cityEntity, returnValue);
@@ -51,15 +53,6 @@ public class CityServiceImpl implements CityService {
 
     @Override
     public List<CityDto> getUsers(int page, int limit) {
-
-        List<CityEntity> cities = cityRepository.findAll();
-
-        for(CityEntity city : cities) {
-            long count = 0;
-            count = city.getUsers().stream().count();
-            city.setNumUsers(count);
-            cityRepository.save(city);
-        }
 
         Pageable pageableRequest = PageRequest.of(page, limit);
         Page<CityEntity> sortedCities = cityRepository.findAllSorted(pageableRequest);
